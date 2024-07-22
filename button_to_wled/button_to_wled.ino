@@ -4,30 +4,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-/*
-  Button
-
-  Turns on and off a light emitting diode(LED) connected to digital pin 13,
-  when pressing a pushbutton attached to pin 2.
-
-  The circuit:
-  - LED attached from pin 13 to ground through 220 ohm resistor
-  - pushbutton attached to pin 2 from +5V
-  - 10K resistor attached to pin 2 from ground
-
-  - Note: on most Arduinos there is already an LED on the board
-    attached to pin 13.
-
-  created 2005
-  by DojoDave <http://www.0j0.org>
-  modified 30 Aug 2011
-  by Tom Igoe
-
-  This example code is in the public domain.
-
-  https://www.arduino.cc/en/Tutorial/BuiltInExamples/Button
-*/
-
 // constants won't change. They're used here to set pin numbers:
 const int buttonPin = 2;  // the number of the pushbutton pin
 const int ledPin = 16;    // the number of the LED pin
@@ -138,32 +114,9 @@ void loop() {
     initializeCube(2);
   }
 
-  // if the button is pressed:
-  // choose an effect
-  // send effect to wled
-  // turn off button led
-  // wait 20 seconds
-  // load default effect
-  // turn button led on
-
-
-
   // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
   if (buttonState == HIGH && buttonState != lastButtonState) {
     Serial.println("Button smashed");
-
-    // pick an effect
-    // use rand for rng
-    // int effectIndex = rand() % numEffects;
-    // const char* cubeOneEffect = lightEffects[effectIndex];
-    // Serial.printf("Cube effect chosen: %s\n", cubeOneEffect);
-    // char cubeOnePayload[200] = {};
-    // sprintf(cubeOnePayload, "{\"seg\":{\"fx\":%s}}", cubeOneEffect);
-
-    // // apply effect to cube 1
-    // Serial.println("Send to cube");
-    // int cubeOneResponse = httpPostRequest(cubeOneUrl, cubeOnePayload);
-    // Serial.println(cubeOneResponse);
     buttonOff();
     if (isCubeZeroConnected) {
       changeCubeEffect(0);
@@ -174,10 +127,11 @@ void loop() {
     if (isCubeTwoConnected) {
       changeCubeEffect(2);
     }
+    // check for connectivity of other cubes
+    // allows for hot swap of cubes
     isCubeZeroConnected = isCubeConnected(0);
     isCubeOneConnected = isCubeConnected(1);
     isCubeTwoConnected = isCubeConnected(2);
-
 
     delay(20000);
     buttonOn();
@@ -196,8 +150,6 @@ String httpGETRequest(const char* serverName) {
   String payload = "{}";
 
   if (httpResponseCode > 0) {
-    // Serial.print("HTTP Response code: ");
-    // Serial.println(httpResponseCode);
     payload = http.getString();
   } else {
     Serial.print("Error code: ");
@@ -216,7 +168,6 @@ int httpPostRequest(const char* serverName, const char* payload) {
   // Turn strip on
   http.addHeader("Content-Type", "application/json");
   int httpResponseCode = http.POST(payload);
-  // Serial.printf("HTTP Response code: %i\n", httpResponseCode);
 
   // Free resources
   http.end();
@@ -276,7 +227,6 @@ void initializeCube(int cubeNumber) {
     return;
   }
 
-  // Serial.println(cubeResponse);
   bool isCubeOn = cubeResponse["state"]["on"];
   int cubeFx = cubeResponse["state"]["seg"]["fx"];
   if (!isCubeOn) {
